@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+
+    <link href="style.css" rel="stylesheet" />    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header>Jogo da Velha</header>
+    <main>
+        <div id="tictactoe-board">
+            <div class="cell" id="cell-00"></div>
+            <div class="cell" id="cell-01"></div>
+            <div class="cell" id="cell-02"></div>
+            <div class="cell" id="cell-10"></div>
+            <div class="cell" id="cell-11"></div>
+            <div class="cell" id="cell-12"></div>
+            <div class="cell" id="cell-20"></div>
+            <div class="cell" id="cell-21"></div>
+            <div class="cell" id="cell-22"></div>
+        </div>
+    </main>
+
+    <script>
+        let cells = document.getElementsByClassName("cell");
+        for (const element of cells){
+            element.addEventListener("click", () => {
+                const span = document.createTextNode("X");
+                element.appendChild(span);
+            })
+        }
+    </script>
+</body>
+</html>
