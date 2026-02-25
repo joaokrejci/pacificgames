@@ -1,19 +1,21 @@
 import "./style.css"
 
+import { API, SessionKeys } from "../../global";
+
 import { useNavigate } from "react-router";
-import useRequest from "../../hooks/useRequest";
+import { useRequest } from "../../hooks";
 import { useState } from "react";
 
 function Player() {
   const navigate = useNavigate();
   const [playerName, setPlayerName] = useState<string>();
   const registerPlayer = useRequest({
-    path: "/register-player",
+    path: API.registerPlayer,
   });
 
   async function handlePlayerInput() {
     const player = await registerPlayer({ name: playerName });
-    sessionStorage.setItem("Player-Info", JSON.stringify(player));
+    sessionStorage.setItem(SessionKeys.PLAYER_INFO, JSON.stringify(player));
     navigate("/games", { replace: true });
   }
 

@@ -14,4 +14,4 @@ function useRequest({ path, method = "POST" }: RequestParams) {
   };
 }
 
-export default useRequest;
+export { useRequest };

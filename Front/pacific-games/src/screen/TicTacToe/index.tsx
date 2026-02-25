@@ -1,8 +1,9 @@
 import "./style.css";
 
 import { useMemo, type JSX } from "react";
-import useGame from "../../hooks/useGame";
+import { useGame } from "../../hooks/useGame";
 import { useNavigate } from "react-router";
+import { SessionKeys } from "../../global/session";
 
 const TicTacToe = function () {
   const {
@@ -14,7 +15,7 @@ const TicTacToe = function () {
     restartSession,
   } = useGame("tictactoe");
   const player = useMemo(() => {
-    const playerInfo = sessionStorage.getItem("Player-Info");
+    const playerInfo = sessionStorage.getItem(SessionKeys.PLAYER_INFO);
     return JSON.parse(playerInfo ?? "{}");
   }, []);
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const TicTacToe = function () {
               <button onClick={() => navigate("/games")}>Voltar</button>
               <button
                 onClick={() => {
-                  sessionStorage.removeItem("Session-Info");
+                  sessionStorage.removeItem(SessionKeys.SESSION_INFO);
                   restartSession();
                 }}
               >
@@ -80,7 +81,7 @@ const TicTacToe = function () {
               </p>
               <button
                 onClick={() => {
-                  sessionStorage.removeItem("Session-Info");
+                  sessionStorage.removeItem(SessionKeys.SESSION_INFO);
                   navigate("/games");
                 }}
               >
@@ -96,7 +97,7 @@ const TicTacToe = function () {
 
   function renderCells(): JSX.Element[] | undefined {
     const cells = board?.info.split(",");
-    return cells?.map((cell, index) => {
+    return cells?.map((cell: string, index: number) => {
       const key = index.toString(3).padStart(2, "0");
       return (
         <button onClick={handleCellClick} className="cell" id={key} key={key}>

@@ -1,5 +1,8 @@
 import { useRef, useState } from "react";
 
+import { SessionKeys } from "../global/session";
+import { useRequest } from "./useRequest";
+
 interface Board {
   info: string;
   nextPlayer: string;
@@ -7,25 +10,10 @@ interface Board {
 
 type ActionFunction = (action: object) => void;
 
-async function joinSession(
-  gameType: string,
-): Promise<{ type: string; data: { id: string } }> {
-  const playerStorage = sessionStorage.getItem("Player-Info");
-  const playerInfo = JSON.parse(playerStorage ?? "{}");
-  const data = await fetch(`${import.meta.env.VITE_API_URL}/join-session`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "join_session",
-      player: playerInfo,
-      game: gameType,
-    }),
-  });
-  return data.json();
-}
-
 const useGame = function (gameType: string) {
-  const sessionInfo = sessionStorage.getItem("Session-Info");
+  const playerStorage = sessionStorage.getItem(SessionKeys.PLAYER_INFO);
+  const playerInfo = JSON.parse(playerStorage ?? '{}')
+  const sessionInfo = sessionStorage.getItem(SessionKeys.SESSION_INFO);
   const sessionObj = JSON.parse(sessionInfo ?? "{}");
 
   const [session, setSession] = useState(sessionObj);
@@ -35,16 +23,22 @@ const useGame = function (gameType: string) {
   const [board, setBoard] = useState<Board | undefined>(undefined);
   const [winner, setWinner] = useState<string | undefined>(undefined);
 
-  const sendAction = useRef<ActionFunction>(() => {});
+  const requestJoinSession = useRequest({ path: '/join-session' });
+
+  const sendAction = useRef<ActionFunction>(() => { });
 
   if (status === "no-session") {
     setStatus("getting-session");
-    joinSession(gameType)
+    requestJoinSession({
+      action: "join_session",
+      player: playerInfo,
+      game: gameType,
+    })
       .then((result) => {
         if (result.type === "SESSION") {
           setStatus("got-session");
           setSession(result.data);
-          sessionStorage.setItem("Session-Info", JSON.stringify(result.data));
+          sessionStorage.setItem(SessionKeys.SESSION_INFO, JSON.stringify(result.data));
         }
         if (result.type === "ERROR") {
           setTimeout(() => {
@@ -81,11 +75,7 @@ const useGame = function (gameType: string) {
 
     ws.onmessage = function (event) {
       const payload = JSON.parse(event.data);
-      console.log(payload);
-      if (!payload || payload.type === "ERROR") {
-        //setSession({});
-        //setStatus("no-session");
-      }
+      
       if (payload.type === "STATUS") {
         clearInterval(interval);
         if (payload.data?.status === "INCOMPLETE") {
@@ -116,4 +106,4 @@ const useGame = function (gameType: string) {
   return { session, status, board, winner, sendAction, restartSession };
 };
 
-export default useGame;
+export { useGame };
