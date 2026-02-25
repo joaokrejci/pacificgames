@@ -3,10 +3,9 @@ package org.example;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class SessionManager {
-    private final Class<? extends Session> sessionType;
+    public final Class<? extends Session> sessionType;
     private final Map<String, Session> sessionMap = new HashMap<>();
     int nextSession = 0;
 

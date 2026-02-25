@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +14,7 @@ public class NimCommandsInterpreter implements CommandInterpreter {
 
     @Override
     public String interpretCommand(String rawCommand) {
+        System.out.println("Command received: " + rawCommand);
         try {
             String[] parts = rawCommand.split(":");
             String command = parts[0];
@@ -21,7 +23,7 @@ public class NimCommandsInterpreter implements CommandInterpreter {
             String arg3 =  parts.length > 3 ? parts[3] : null;
 
             if (command.equalsIgnoreCase("IDENTIFY")) {
-                return "NIM";
+                return Config.instance.get("server.type");
             }
             if (command.equalsIgnoreCase("CLOSE")) {
                 return "BYE";
@@ -44,23 +46,21 @@ public class NimCommandsInterpreter implements CommandInterpreter {
 
                 return session.getStatus();
             }
-            if (command.equalsIgnoreCase("TAKE")) {
-                Session session = sessionManager.get(arg2);
-                if (session == null) {
-                    return "INVALID_SESSION";
-                }
-                boolean success = session.doAction(arg1, "TAKE", Integer.parseInt(arg3));
-                if (success) {
-                    return session.getStatus();
-                } else {
-                    return "INVALID_ACTION;\nSESSION_"+session.getStatus();
-                }
+
+            Session session = sessionManager.get(arg2);
+            if (session == null) {
+                return "ERROR:INVALID_SESSION";
             }
+            boolean success = session.doAction(arg1, command.toUpperCase(), arg3);
+            if (success) {
+                return session.getStatus();
+            } else {
+                return "ERROR:INVALID_ACTION;\nSESSION_"+session.getStatus();
+            }
+
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, e.getMessage());
             return "ERROR:INVALID_COMMAND";
         }
-
-        return "ERROR:UNKNOWN_COMMAND";
     }
 }

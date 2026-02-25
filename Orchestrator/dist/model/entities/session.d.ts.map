@@ -1,0 +1,1 @@
+{"version":3,"file":"session.d.ts","sourceRoot":"","sources":["../../../src/model/entities/session.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,UAAU,CAAA;AAEjC,UAAU,OAAO;IACb,EAAE,EAAE,MAAM,CAAA;IACV,UAAU,EAAE,MAAM,CAAA;IAClB,OAAO,EAAE,MAAM,EAAE,CAAA;CACpB;AAED,OAAO,EAAE,OAAO,EAAE,CAAA"}

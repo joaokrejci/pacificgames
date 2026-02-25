@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SocketCommandReader implements CommandReader {
+public class SocketCommandReader extends Thread {
     private static final Logger LOGGER = Logger.getLogger(SocketCommandReader.class.getName());
     private static final ExecutorService CLIENTS_POOL = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -22,7 +22,7 @@ public class SocketCommandReader implements CommandReader {
     }
 
     @Override
-    public void start() {
+    public void run() {
         int port = getPort();
         try {
             serverSocket = new ServerSocket(port);
@@ -39,8 +39,8 @@ public class SocketCommandReader implements CommandReader {
 
     private static int getPort() {
         return Optional
-                .ofNullable(System.getenv("NIM_SERVER_PORT"))
-                .map(Integer::parseInt)
+                .ofNullable(Config.instance.get("server.port"))
+                .map(port -> (Integer) port)
                 .orElse(6000);
     }
 
@@ -76,14 +76,5 @@ public class SocketCommandReader implements CommandReader {
         outputStream.write(response.getBytes());
         outputStream.write("\n".getBytes());
         outputStream.flush();
-    }
-
-    @Override
-    public void stop() {
-        try {
-            serverSocket.close();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to close server socket: {}", e.getMessage());
-        }
     }
 }

@@ -3,11 +3,58 @@
  */
 package org.example;
 
-public class App {
-    public static void main(String[] args) {
-        CommandInterpreter nimCommandInterpreter = new NimCommandsInterpreter(new SessionManager(NimSession.class));
+import java.util.logging.Logger;
 
-        CommandReader commandReader = new SocketCommandReader(nimCommandInterpreter);
+public class App {
+    private static final Logger LOGGER = Logger.getLogger(App.class.getName());
+
+    public static void main(String[] args) {
+        setupConfig();
+
+        Class<? extends Session> sessionType;
+
+        String gameType = Config.instance.get("server.type");
+
+        if (gameType == null) {
+            LOGGER.warning("Server type not specified");
+            return;
+        } else if (gameType.equalsIgnoreCase("NIM")) {
+            sessionType = NimSession.class;
+        } else if (gameType.equalsIgnoreCase("TICTACTOE")) {
+            sessionType = TicTacToeSession.class;
+        } else {
+            LOGGER.warning("Server type not valid");
+            return;
+        }
+
+        CommandInterpreter nimCommandInterpreter = new NimCommandsInterpreter(new SessionManager(sessionType));
+
+        Thread commandReader = new SocketCommandReader(nimCommandInterpreter);
         commandReader.start();
+
+        Thread announcer = new Announcer();
+        announcer.start();
+
+        LOGGER.info(Config.instance.get("server.type") + " Server Started on port " + Config.instance.get("server.port"));
+
+        try {
+            commandReader.join();
+            announcer.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void setupConfig() {
+        Config.instance.put("server.type", "NIM");
+        Config.instance.put("server.port", 6000);
+
+        String gameType = System.getenv("SERVER_TYPE");
+        String port = System.getenv("SERVER_PORT");
+
+        int intPort = port == null ? 6000 : Integer.parseInt(port);
+
+        Config.instance.put("server.type", gameType);
+        Config.instance.put("server.port", intPort);
     }
 }

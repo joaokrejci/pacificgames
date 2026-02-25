@@ -1,0 +1,84 @@
+.modal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    p {
+        color: white;
+    }
+}
+
+.modal-content {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.waiting-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    animation: spin 5s infinite ease-in-out;
+    display: inline-block;
+    font-size: 56px;
+    height: 30px;
+    line-height: 0.5;
+}
+
+#session-id {
+    position: absolute;
+    bottom: 21px;
+    left: 21px;
+}
+
+.TicTacToe {
+    text-align: center;
+    width: 100%;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    justify-content: center;
+}
+
+#tictactoe-board {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 5px;
+    width: calc(3 * 56px + 5px * 2 + 21px * 2);
+    height: calc(3 * 56px + 5px * 2 + 21px * 2);
+    border: 21px solid white;
+    background-color: #222;
+}
+
+.cell {
+    height: 56px;
+    width: 56px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    font-weight: bold;
+    color: #222;
+}

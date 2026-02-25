@@ -27,12 +27,14 @@ public class NimSession implements Session {
         }
 
         if (action.equals("TAKE")) {
-            int pebblesToTake = (Integer) args[0];
+            int pebblesToTake = Integer.parseInt((String) args[0]);
             if (pebblesToTake > numberOfPebbles || pebblesToTake < 1 || pebblesToTake > 3) {
                 return false;
             }
 
             numberOfPebbles = numberOfPebbles - pebblesToTake;
+        } else {
+            return false;
         }
 
         currentPlayer = (currentPlayer + 1) % MAXIMUM_NUMBER_OF_PLAYERS;
