@@ -3,6 +3,8 @@ import * as net from "node:net";
 import Command, { CommandAction } from "./command";
 import { Result, ResultType, SessionStatus } from "./result";
 
+import readline from 'node:readline'
+
 class Server {
   private readonly host: string;
   private readonly port: number;
@@ -28,14 +30,14 @@ class Server {
       await this.open();
     }
 
+    const io = readline.createInterface({input: this.socket, output: this.socket})
     const strCommand: string = `${this.formatCommand(command)}\n`;
     this.socket?.write(strCommand);
     console.log(`Sent command: ${strCommand}`)
-    return await new Promise((resolve, reject) => {
-      this.socket?.on("data", (chunk) => {
-        const message = chunk.toString().split("\n")[0];
-        console.log(`Received response: ${message}`)
-        resolve(this.formatResult(message));
+    return await new Promise((resolve) => {
+      io.on("line", (line) => {
+        console.log(`Received response: ${line}`)
+        resolve(this.formatResult(line));
       });
     });
   }

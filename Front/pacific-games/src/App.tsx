@@ -9,7 +9,7 @@ import TicTacToe from "./screen/TicTacToe";
 function App() {
   const navigate = useNavigate();
   function logout() {
-    sessionStorage.removeItem("Player-Info");
+    sessionStorage.clear();
     navigate("/", { replace: true });
   }
 

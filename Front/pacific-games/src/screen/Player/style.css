@@ -1,12 +1,16 @@
 .Player {
     margin: auto;
-    width: 377px;
+    width: 320px;
     height: 233px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 21px;
     box-sizing: border-box;
+
+    label {
+        color: #333;
+    }
 
     input {
         height: 56px;
