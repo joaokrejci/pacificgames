@@ -1,31 +1,31 @@
 import "./style.css";
 
-import { useMemo, type JSX } from "react";
-import { useGame } from "../../hooks/useGame";
+import { useContext, useMemo, type JSX } from "react";
+import { GameState, useGame } from "../../hooks/useGame";
 import { useNavigate } from "react-router";
 import { SessionKeys } from "../../global/session";
+import { Games } from "../../global";
+import { Paths } from "../../routing/DefaultRouter";
+import { PlayerContext, SessionContext } from "../../context";
 
 const TicTacToe = function () {
   const {
     status,
-    session,
     board,
     winner,
     sendAction: { current: sendAction },
     restartSession,
-  } = useGame("tictactoe");
-  const player = useMemo(() => {
-    const playerInfo = sessionStorage.getItem(SessionKeys.PLAYER_INFO);
-    return JSON.parse(playerInfo ?? "{}");
-  }, []);
+  } = useGame(Games.TIC_TAC_TOE);
+  const [player] = useContext(PlayerContext)
+  const [session] = useContext(SessionContext)
   const navigate = useNavigate();
 
-  function getOtherPlayer(): string {
+  function getOtherPlayer(): string | undefined {
     return session.players?.find(({ id }: { id: string }) => id !== player.id)
       ?.name;
   }
 
-  function getNextPlayer(): string {
+  function getNextPlayer(): string | undefined {
     return session.nextPlayer?.name;
   }
 
@@ -54,17 +54,16 @@ const TicTacToe = function () {
     });
   };
 
-  if (status != "ready") {
+  if (status != GameState.READY) {
     return (
       <div className="modal">
         <div className="modal-content">
-          {status === "over" ? (
+          {status === GameState.OVER ? (
             <>
               {getWinner()}
-              <button onClick={() => navigate("/games")}>Voltar</button>
+              <button onClick={() => navigate(Paths.GAMES)}>Voltar</button>
               <button
                 onClick={() => {
-                  sessionStorage.removeItem(SessionKeys.SESSION_INFO);
                   restartSession();
                 }}
               >
@@ -80,9 +79,9 @@ const TicTacToe = function () {
                 <span className="spinner">&times;</span>
               </p>
               <button
-                onClick={() => {
-                  sessionStorage.removeItem(SessionKeys.SESSION_INFO);
-                  navigate("/games");
+                  onClick={() => {
+                    
+                  navigate(Paths.GAMES);
                 }}
               >
                 Desistir

@@ -1,10 +1,12 @@
 import "./style.css"
 
 import { API, SessionKeys } from "../../global";
+import { useContext, useState } from "react";
 
+import { Paths } from "../../routing/DefaultRouter";
+import { PlayerContext } from "../../context";
 import { useNavigate } from "react-router";
 import { useRequest } from "../../hooks";
-import { useState } from "react";
 
 function Player() {
   const navigate = useNavigate();
@@ -12,11 +14,12 @@ function Player() {
   const registerPlayer = useRequest({
     path: API.registerPlayer,
   });
+  const [,setPlayer] = useContext(PlayerContext)
 
   async function handlePlayerInput() {
     const player = await registerPlayer({ name: playerName });
-    sessionStorage.setItem(SessionKeys.PLAYER_INFO, JSON.stringify(player));
-    navigate("/games", { replace: true });
+    setPlayer(player)
+    navigate(Paths.GAMES, { replace: true });
   }
 
   return (
@@ -26,7 +29,7 @@ function Player() {
         onChange={(ev) => setPlayerName(ev.target.value)}
         id="PlayerName"
       ></input>
-      <button onClick={handlePlayerInput}>Ok</button>
+      <button onClick={handlePlayerInput}>OK</button>
     </div>
   );
 }

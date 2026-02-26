@@ -1,18 +1,26 @@
-import { createContext, useState, type Dispatch, type PropsWithChildren, type SetStateAction } from "react";
+import { createContext, useMemo, useState, type PropsWithChildren } from "react";
 import { SessionKeys } from "../global";
 
 type Player = {
-    id?: string
-    name?: string
+    id: string
+    name: string
 }
 
-const PlayerContext = createContext<[Player, Dispatch<SetStateAction<Player>>]>([{}, () => { }])
+type PlayerContextType = [Player | undefined, (player: Player) => void];
 
-function PlayerProvider({ children }: PropsWithChildren) {
+const PlayerContext = createContext<PlayerContextType>([undefined, () => {}])
+
+function PlayerProvider({ children }: Readonly<PropsWithChildren>) {
     const [player, setPlayer] = useState(getPlayerFromStorage());
+    const setPlayerWithStorage = (newPlayer: Player) => {
+        console.log(newPlayer)
+        setPlayer(newPlayer);
+        sessionStorage.setItem(SessionKeys.PLAYER_INFO, JSON.stringify(newPlayer))
+    }
+    const playerContext = useMemo<PlayerContextType>(() => ([player, setPlayerWithStorage]), [player]);
 
     return (
-        <PlayerContext.Provider value={[player, setPlayer]}>
+        <PlayerContext.Provider value={playerContext}>
             {children}
         </PlayerContext.Provider>
     )

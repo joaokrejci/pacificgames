@@ -1,22 +1,22 @@
 import "./App.css";
 
-import { Navigate, Route, Routes, useNavigate } from "react-router";
-
-import Games from "./screen/Games";
-import Player from "./screen/Player";
+import { DefaultRouter } from "./routing/DefaultRouter";
 import { PlayerContext } from "./context/player-context";
-import { PrivateRoute } from "./routing/PrivateRoute";
-import TicTacToe from "./screen/TicTacToe";
+import { SessionContext } from "./context";
 import { useContext } from "react";
+import { useNavigate } from "react-router";
 
 function App() {
+  const [player, setPlayer] = useContext(PlayerContext)
+  const [, setSession] = useContext(SessionContext)
+
   const navigate = useNavigate();
   function logout() {
     sessionStorage.clear();
+    setPlayer({id: '', name: ''});
+    setSession({})
     navigate("/", { replace: true });
   }
-
-  const [player] = useContext(PlayerContext)
 
   return (
     <>
@@ -37,7 +37,7 @@ function App() {
       </header>
 
       <main>
-
+        <DefaultRouter />
       </main>
     </>
   );

@@ -11,6 +11,7 @@ const Paths = {
     ROOT: '/',
     GAMES: '/games',
     TICTACTOE: '/tictactoe',
+    NIM: '/nim'
 }
 
 function DefaultRouter() {
@@ -22,14 +23,24 @@ function DefaultRouter() {
                 index
                 element={player?.id ? <Navigate to={Paths.GAMES} /> : <Player />}
             />
-            <PrivateRoute
-                path={Paths.GAMES}
-                element={<Games />}
-            />
-            <PrivateRoute
-                path={Paths.TICTACTOE}
-                element={<TicTacToe />}
-            />
+            <>
+                <Route
+                    path={Paths.GAMES}
+                    element={
+                        <PrivateRoute>
+                            <Games />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path={Paths.TICTACTOE}
+                    element={
+                        <PrivateRoute>
+                            <TicTacToe />
+                        </PrivateRoute>
+                    }
+                />
+            </>
         </Routes>
     )
 }

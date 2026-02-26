@@ -1,19 +1,21 @@
-import { useContext, type PropsWithChildren } from "react";
-import { PlayerContext } from "../../context/player-context";
-import { Navigate, Route } from "react-router";
+import { Navigate } from "react-router";
 import { Paths } from "../DefaultRouter";
+import { PlayerContext } from "../../context/player-context";
+import { useContext, type PropsWithChildren } from "react";
 
-function PrivateRoute({ children, ...props }: PropsWithChildren & Record<string, unknown>) {
+function PrivateRoute({ children }: Readonly<PropsWithChildren>) {
     const [player] = useContext(PlayerContext)
 
     if (!player?.id) {
-        <Navigate to={Paths.ROOT} />
+        return (
+            <Navigate to={Paths.ROOT} />
+        )
     }
 
     return (
-        <Route {...props}>
+        <>
             {children}
-        </Route>
+        </>
     )
 }
 

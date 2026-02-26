@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { API, Games } from "../global";
+import { PlayerContext, SessionContext } from "../context";
+import { useContext, useRef, useState } from "react";
 
-import { SessionKeys } from "../global/session";
 import { useRequest } from "./useRequest";
 
 interface Board {
@@ -8,52 +9,56 @@ interface Board {
   nextPlayer: string;
 }
 
+const GameState = {
+  NO_SESSION: 0,
+  GETTING_SESSION: 1,
+  GOT_SESSION: 2,
+  SUBSCRIBING: 3,
+  WAITING: 4,
+  READY: 5,
+  OVER: 6
+}
+
 type ActionFunction = (action: object) => void;
 
 const useGame = function (gameType: string) {
-  const playerStorage = sessionStorage.getItem(SessionKeys.PLAYER_INFO);
-  const playerInfo = JSON.parse(playerStorage ?? '{}')
-  const sessionInfo = sessionStorage.getItem(SessionKeys.SESSION_INFO);
-  const sessionObj = JSON.parse(sessionInfo ?? "{}");
-
-  const [session, setSession] = useState(sessionObj);
+  const [session, setSession] = useContext(SessionContext);
+  const [player] = useContext(PlayerContext)
+  
   const [status, setStatus] = useState(
-    sessionObj?.id ? "got-session" : "no-session",
+    session?.id ? GameState.GOT_SESSION : GameState.NO_SESSION
   );
+  
   const [board, setBoard] = useState<Board | undefined>(undefined);
   const [winner, setWinner] = useState<string | undefined>(undefined);
 
-  const requestJoinSession = useRequest({ path: '/join-session' });
+  const requestJoinSession = useRequest({ path: API.joinSession });
 
   const sendAction = useRef<ActionFunction>(() => { });
 
-  if (status === "no-session") {
-    setStatus("getting-session");
+  if (status === GameState.NO_SESSION) {
+    setStatus(GameState.GETTING_SESSION);
     requestJoinSession({
       action: "join_session",
-      player: playerInfo,
+      player: player,
       game: gameType,
     })
       .then((result) => {
         if (result.type === "SESSION") {
-          setStatus("got-session");
+          setStatus(GameState.GOT_SESSION);
           setSession(result.data);
-          sessionStorage.setItem(SessionKeys.SESSION_INFO, JSON.stringify(result.data));
         }
         if (result.type === "ERROR") {
           setTimeout(() => {
-            setStatus("no-session");
+            setStatus(GameState.NO_SESSION);
           }, 5000);
         }
-      })
-      .catch((error) => {
-        console.error(error);
       });
   }
 
-  if (status === "got-session") {
-    setStatus("subscribing-session");
-    const ws = new WebSocket(`${import.meta.env.VITE_API_URL}/game`);
+  if (status === GameState.GOT_SESSION) {
+    setStatus(GameState.SUBSCRIBING);
+    const ws = new WebSocket(`${API.URL}${API.game}`);
     function subscribeToSession() {
       const command = {
         action: "subscribe_to_session",
@@ -66,7 +71,7 @@ const useGame = function (gameType: string) {
     ws.onopen = function () {
       subscribeToSession();
       sendAction.current = (action: object) => {
-        ws.send(JSON.stringify({ ...action, game: "tictactoe" }));
+        ws.send(JSON.stringify({ ...action, game: Games.TIC_TAC_TOE }));
       };
     };
 
@@ -75,18 +80,18 @@ const useGame = function (gameType: string) {
 
     ws.onmessage = function (event) {
       const payload = JSON.parse(event.data);
-      
+
       if (payload.type === "STATUS") {
         clearInterval(interval);
         if (payload.data?.status === "INCOMPLETE") {
-          setStatus("waiting");
+          setStatus(GameState.WAITING);
         }
         if (payload.data?.status === "BOARD") {
-          setStatus("ready");
+          setStatus(GameState.READY);
           setBoard(payload.data);
         }
         if (payload.data?.status === "OVER") {
-          setStatus("over");
+          setStatus(GameState.OVER);
           setWinner(payload.data?.info);
         }
       }
@@ -98,12 +103,12 @@ const useGame = function (gameType: string) {
 
   function restartSession() {
     setSession({});
-    setStatus("no-session");
+    setStatus(GameState.NO_SESSION);
     setBoard(undefined);
     setWinner(undefined);
   }
 
-  return { session, status, board, winner, sendAction, restartSession };
+  return { status, board, winner, sendAction, restartSession };
 };
 
-export { useGame };
+export { useGame, GameState };
