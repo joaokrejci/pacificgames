@@ -1,8 +1,8 @@
 import "./style.css"
 
-import { API, SessionKeys } from "../../global";
 import { useContext, useState } from "react";
 
+import { API } from "../../global";
 import { Paths } from "../../routing/DefaultRouter";
 import { PlayerContext } from "../../context";
 import { useNavigate } from "react-router";

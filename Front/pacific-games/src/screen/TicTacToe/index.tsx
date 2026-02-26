@@ -1,9 +1,8 @@
 import "./style.css";
 
-import { useContext, useMemo, type JSX } from "react";
+import { useContext, type JSX } from "react";
 import { GameState, useGame } from "../../hooks/useGame";
 import { useNavigate } from "react-router";
-import { SessionKeys } from "../../global/session";
 import { Games } from "../../global";
 import { Paths } from "../../routing/DefaultRouter";
 import { PlayerContext, SessionContext } from "../../context";
@@ -21,7 +20,7 @@ const TicTacToe = function () {
   const navigate = useNavigate();
 
   function getOtherPlayer(): string | undefined {
-    return session.players?.find(({ id }: { id: string }) => id !== player.id)
+    return session.players?.find(({ id }: { id: string }) => id !== player?.id)
       ?.name;
   }
 
