@@ -19,6 +19,8 @@ export default class NetworkDiscoverer {
                     return;
                 }
 
+                console.info(`${parts[1]} server found on ${remote.address}:${parts[2]}`)
+
                 ServerDAO.instance.touch(new Server(remote.address, Number.parseInt(parts[2]), parts[1], new Date()))
             }
         });

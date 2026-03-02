@@ -1,0 +1,38 @@
+services:
+  nim-server: 
+    build: ./NimServer
+    environment:
+      - SERVER_TYPE=nim
+    networks:
+      - pg-network
+  
+  tictactoe-server: 
+    build: ./NimServer
+    environment:
+      - SERVER_TYPE=tictactoe
+    networks:
+      - pg-network
+  
+  tictactoe-server-2:
+    build: ./NimServer
+    environment:
+      - SERVER_TYPE=tictactoe
+    networks:
+      - pg-network
+  
+  orchestrator:
+    build: ./Orchestrator
+    networks:
+      - pg-network
+  
+  website:
+    build: ./Front/pacific-games
+    ports:
+      - 80:80
+    networks:
+      - pg-network
+
+
+networks:
+  pg-network:
+    driver: bridge

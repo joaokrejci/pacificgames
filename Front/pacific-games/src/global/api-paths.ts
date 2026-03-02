@@ -1,5 +1,5 @@
 const API: Record<string, string> = {
-    URL: import.meta.env.VITE_API_URL,
+    URL: '/api',
     registerPlayer: '/register-player',
     joinSession: '/join-session',
     game: '/game'

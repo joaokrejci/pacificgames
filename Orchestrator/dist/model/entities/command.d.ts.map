@@ -1,1 +1,0 @@
-{"version":3,"file":"command.d.ts","sourceRoot":"","sources":["../../../src/model/entities/command.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,UAAU,CAAA;AACjC,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAA;AAEnC,UAAU,OAAO;IACb,MAAM,EAAE,MAAM,CAAA;IACd,OAAO,EAAE,OAAO,CAAA;IAChB,MAAM,EAAE,MAAM,CAAA;IACd,IAAI,EAAE,MAAM,CAAA;CACf;AAED,eAAe,OAAO,CAAA"}
