@@ -1,17 +1,20 @@
 import { Navigate, Route, Routes } from "react-router";
 
 import Games from "../../screen/Games";
+import Nim from "../../screen/Nim";
 import Player from "../../screen/Player";
 import { PlayerContext } from "../../context/player-context";
 import { PrivateRoute } from "../PrivateRoute";
 import TicTacToe from "../../screen/TicTacToe";
+import ConnectFour from "../../screen/ConnectFour";
 import { useContext } from "react";
 
 const Paths = {
     ROOT: '/',
     GAMES: '/games',
     TICTACTOE: '/tictactoe',
-    NIM: '/nim'
+    NIM: '/nim',
+    CONNECTFOUR: '/connectfour'
 }
 
 function DefaultRouter() {
@@ -37,6 +40,22 @@ function DefaultRouter() {
                     element={
                         <PrivateRoute>
                             <TicTacToe />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path={Paths.NIM}
+                    element={
+                        <PrivateRoute>
+                            <Nim />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path={Paths.CONNECTFOUR}
+                    element={
+                        <PrivateRoute>
+                            <ConnectFour />
                         </PrivateRoute>
                     }
                 />

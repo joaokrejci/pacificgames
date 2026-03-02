@@ -11,6 +11,7 @@ class Server {
   private readonly type: string;
   private readonly timestamp: Date;
   private socket: net.Socket | null;
+  private commandQueue: Promise<Result>;
 
   public constructor(
     host: string,
@@ -23,20 +24,30 @@ class Server {
     this.type = type;
     this.timestamp = timestamp;
     this.socket = null;
+    this.commandQueue = Promise.resolve({} as Result);
   }
 
-  public async sendCommand(command: Command): Promise<Result> {
+  public sendCommand(command: Command): Promise<Result> {
+    this.commandQueue = this.commandQueue.then(
+      () => this.executeSendCommand(command),
+      () => this.executeSendCommand(command),
+    );
+    return this.commandQueue;
+  }
+
+  private async executeSendCommand(command: Command): Promise<Result> {
     if (!this.socket?.readable) {
       await this.open();
     }
 
-    const io = readline.createInterface({input: this.socket, output: this.socket})
+    const io = readline.createInterface({input: this.socket!, output: this.socket!})
     const strCommand: string = `${this.formatCommand(command)}\n`;
     this.socket?.write(strCommand);
     console.log(`Sent command: ${strCommand}`)
     return await new Promise((resolve) => {
       io.on("line", (line) => {
         console.log(`Received response: ${line}`)
+        io.close();
         resolve(this.formatResult(line));
       });
     });
@@ -68,6 +79,10 @@ class Server {
         return `session_status:${command.session.id}`;
       case CommandAction.PLACE:
         return `place:${command.player.id}:${command.session.id}:${command.parameter}`;
+      case CommandAction.TAKE:
+        return `take:${command.player.id}:${command.session.id}:${command.parameter}`;
+      case CommandAction.ABANDON:
+        return `leave:${command.player.id}:${command.session.id}`;
       default:
         return "identity";
     }

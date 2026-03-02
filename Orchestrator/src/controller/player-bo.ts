@@ -8,6 +8,6 @@ export default class PlayerBO {
     }
 
     get(id: string) {
-        PlayerDAO.instance.get(id)
+        return PlayerDAO.instance.get(id)
     }
 }

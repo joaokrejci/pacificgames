@@ -3,6 +3,7 @@ import "./style.css";
 import { Paths } from "../../routing/DefaultRouter";
 import nimSvg from "../../assets/nim.svg";
 import ticTacToeSvg from "../../assets/tictactoe.svg";
+import connectFourSvg from "../../assets/connectfour.svg";
 
 const Games = function () {
   return (
@@ -18,6 +19,11 @@ const Games = function () {
         <a href={Paths.NIM} className="card" id="nim">
           <img src={nimSvg} alt="Nim" />
           <p>NIM</p>
+        </a>
+
+        <a href={Paths.CONNECTFOUR} className="card" id="connectfour">
+          <img src={connectFourSvg} alt="Quatro em linha" />
+          <p>QUATRO EM LINHA</p>
         </a>
       </div>
     </div>

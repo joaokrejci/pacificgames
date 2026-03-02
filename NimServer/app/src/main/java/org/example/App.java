@@ -22,6 +22,8 @@ public class App {
             sessionType = NimSession.class;
         } else if (gameType.equalsIgnoreCase("TICTACTOE")) {
             sessionType = TicTacToeSession.class;
+        } else if (gameType.equalsIgnoreCase("CONNECTFOUR")) {
+            sessionType = ConnectFourSession.class;
         } else {
             LOGGER.warning("Server type not valid");
             return;

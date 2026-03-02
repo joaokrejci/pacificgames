@@ -46,6 +46,13 @@ public class NimCommandsInterpreter implements CommandInterpreter {
 
                 return session.getStatus();
             }
+            if (command.equalsIgnoreCase("LEAVE")) {
+                if (arg1 == null || arg2 == null) {
+                    return "ERROR:ARGS_REQUIRED";
+                }
+                boolean left = sessionManager.leaveSession(arg2, arg1);
+                return left ? "STATUS:OK" : "ERROR:LEAVE_FAILED";
+            }
 
             Session session = sessionManager.get(arg2);
             if (session == null) {

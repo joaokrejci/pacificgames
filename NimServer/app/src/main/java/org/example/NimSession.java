@@ -21,6 +21,11 @@ public class NimSession implements Session {
     }
 
     @Override
+    public synchronized boolean leave(String clientId) {
+        return players.remove(clientId);
+    }
+
+    @Override
     public synchronized boolean doAction(String clientId, String action, Object... args) {
         if (!isValid(clientId)) {
             return false;
@@ -38,6 +43,13 @@ public class NimSession implements Session {
         }
 
         currentPlayer = (currentPlayer + 1) % MAXIMUM_NUMBER_OF_PLAYERS;
+
+        // Se sobrou apenas 1 pedra, o próximo jogador é obrigado a pegar e perde
+        if (numberOfPebbles == 1) {
+            numberOfPebbles = 0;
+            currentPlayer = (currentPlayer + 1) % MAXIMUM_NUMBER_OF_PLAYERS;
+        }
+
         return true;
     }
 
@@ -55,8 +67,8 @@ public class NimSession implements Session {
         }
 
         if (numberOfPebbles == 0) {
-            int lastPlayer = (currentPlayer - 1) % MAXIMUM_NUMBER_OF_PLAYERS;
-            return "STATUS:OVER:%s".formatted(players.get(lastPlayer));
+            // currentPlayer aponta para o vencedor (quem NÃO pegou a última pedra)
+            return "STATUS:OVER:%s".formatted(players.get(currentPlayer));
         }
 
         return "STATUS:%d:%s".formatted(numberOfPebbles, players.get(currentPlayer));

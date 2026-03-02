@@ -53,19 +53,31 @@ function start() {
   });
 
   app.ws("/game", (ws, request) => {
+    const notifyUpdate = function (update: Result) {
+      try {
+        ws.send(JSON.stringify(update));
+      } catch (_) {  }
+    };
+
     ws.on("message", async (message: Buffer) => {
       const command: Command = JSON.parse(message.toString());
       if (!command) {
         ws.send(JSON.stringify({ error: "Invalid command" }));
       }
 
-      SessionBO.instance.interpretCommand({
+      const result = await SessionBO.instance.interpretCommand({
         command,
-        notifyUpdate: function (update: Result) {
-          ws.send(JSON.stringify(update));
-        },
+        notifyUpdate,
       });
+      if (result?.type === "ERROR") {
+        ws.send(JSON.stringify(result));
+      }
     });
+
+    ws.on("close", () => {
+      SessionBO.instance.unsubscribeObserver(notifyUpdate);
+    });
+
     ws.on("error", (error) => {
       console.error(error);
     });

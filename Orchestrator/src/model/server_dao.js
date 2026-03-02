@@ -12,7 +12,7 @@ class ServerDAO {
     }
 
     getServer(type) {
-        const typeServers = Object.values(this.servers).filter(({ type: serverType }) => type == serverType)
+        const typeServers = Object.values(this.servers).filter(({ type: serverType }) => type?.toLowerCase() == serverType?.toLowerCase())
         return typeServers[0]
     }
 }
