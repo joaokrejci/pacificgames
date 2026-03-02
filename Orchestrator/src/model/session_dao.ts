@@ -5,20 +5,30 @@ class SessionDAO {
 
   public static readonly instance = new SessionDAO();
 
-  public touch(server: Server, player: Player, sessionId: string) {
-    const session: Session = this.sessions[sessionId] || new Session(sessionId, server);
+  private key(game: string, sessionId: string): string {
+    return `${game}:${sessionId}`;
+  }
+
+  public touch(server: Server, player: Player, sessionId: string, game: string) {
+    const key = this.key(game, sessionId);
+    let session: Session = this.sessions[key];
+    if (!session || session.isDead) {
+      session = new Session(sessionId, server);
+    }
     if (!session.players.some(({ id }) => player.id === id)) {
       session.players.push(player);
     }
-    this.sessions[sessionId] = session;
+    this.sessions[key] = session;
   }
 
-  public putSession(session: Session) {
-    this.sessions[session.id] = session;
+  public putSession(session: Session, game: string) {
+    const key = this.key(game, session.id);
+    this.sessions[key] = session;
   }
 
-  public getSession(sessionId: string) {
-    return this.sessions[sessionId];
+  public getSession(sessionId: string, game: string) {
+    const key = this.key(game, sessionId);
+    return this.sessions[key];
   }
 }
 

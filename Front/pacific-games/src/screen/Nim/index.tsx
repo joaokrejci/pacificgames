@@ -7,7 +7,7 @@ import { Games } from "../../global";
 import { Paths } from "../../routing/DefaultRouter";
 import { PlayerContext, SessionContext } from "../../context";
 
-const TicTacToe = function () {
+const Nim = function () {
   const {
     status,
     board,
@@ -15,9 +15,9 @@ const TicTacToe = function () {
     sendAction: { current: sendAction },
     restartSession,
     abandonSession,
-  } = useGame(Games.TIC_TAC_TOE);
-  const [player] = useContext(PlayerContext)
-  const [session] = useContext(SessionContext)
+  } = useGame(Games.NIM);
+  const [player] = useContext(PlayerContext);
+  const [session] = useContext(SessionContext);
   const navigate = useNavigate();
 
   function getOtherPlayer(): string | undefined {
@@ -29,33 +29,42 @@ const TicTacToe = function () {
     return session.nextPlayer?.name;
   }
 
-  function getWinner(): JSX.Element {    if (winner == "ABANDONED") {
+  function isMyTurn(): boolean {
+    return session.nextPlayer?.id === player?.id;
+  }
+
+  function getWinner(): JSX.Element {
+    if (winner === "ABANDONED") {
       return <p>O adversário desistiu.</p>;
-    }    if (winner == "TIE") {
-      return <p>Empate!</p>;
     }
     if (winner) {
-      const winnerPlayer = session.players?.find(({ id }: { id: string }) => {
-        return id === winner;
-      });
-      return <p>O vencedor é {winnerPlayer?.name}</p>;
+      const winnerPlayer = session.players?.find(
+        ({ id }: { id: string }) => id === winner
+      );
+      return <p>O vencedor é {winnerPlayer?.name ?? winner}</p>;
     }
     return <></>;
   }
 
-  const handleCellClick: React.MouseEventHandler<HTMLButtonElement> = function (
-    event,
-  ) {
-    const button = event.target as HTMLButtonElement;
+  function getPebbleCount(): number {
+    return parseInt(board?.info ?? "0", 10);
+  }
+
+  function handleTake(amount: number) {
     sendAction({
-      action: "place",
-      parameter: button.id,
+      action: "take",
+      parameter: amount.toString(),
       session: session,
       player: player,
     });
-  };
+  }
 
-  if (status != GameState.READY) {
+  function handleForfeit() {
+    abandonSession();
+    navigate(Paths.GAMES);
+  }
+
+  if (status !== GameState.READY) {
     return (
       <div className="modal">
         <div className="modal-content">
@@ -63,11 +72,7 @@ const TicTacToe = function () {
             <>
               {getWinner()}
               <button onClick={() => { abandonSession(); navigate(Paths.GAMES); }}>Voltar</button>
-              <button
-                onClick={() => {
-                  restartSession();
-                }}
-              >
+              <button onClick={() => restartSession()}>
                 Procurar outra partida
               </button>
             </>
@@ -79,14 +84,7 @@ const TicTacToe = function () {
                 </span>
                 <span className="spinner">&times;</span>
               </p>
-              <button
-                  onClick={() => {
-                  abandonSession();
-                  navigate(Paths.GAMES);
-                }}
-              >
-                Desistir
-              </button>
+              <button onClick={() => { abandonSession(); navigate(Paths.GAMES); }}>Desistir</button>
             </>
           )}
           <p id="session-id">ID da sessão: {session.id}</p>
@@ -95,35 +93,48 @@ const TicTacToe = function () {
     );
   }
 
-  function renderCells(): JSX.Element[] | undefined {
-    const cells = board?.info.split(",");
-    return cells?.map((cell: string, index: number) => {
-      const key = index.toString(3).padStart(2, "0");
-      return (
-        <button onClick={handleCellClick} className="cell" id={key} key={key}>
-          {cell.replace("cross", "\u2a09").replace("circle", "\u2b58")}
-        </button>
+  function renderPebbles(): JSX.Element[] {
+    const total = 23;
+    const remaining = getPebbleCount();
+    const pebbles: JSX.Element[] = [];
+
+    for (let i = 0; i < total; i++) {
+      const isRemoved = i >= remaining;
+      pebbles.push(
+        <div
+          key={i}
+          className={`pebble ${isRemoved ? "removed" : ""}`}
+        />
       );
-    });
+    }
+    return pebbles;
   }
 
-  function handleForfeit() {
-    abandonSession();
-    navigate(Paths.GAMES);
-  }
+  const pebbleCount = getPebbleCount();
 
   return (
-    <div className="TicTacToe">
-      <h2>Jogo da Velha</h2>
+    <div className="Nim">
+      <h2>Nim</h2>
       <p>Você está jogando com {getOtherPlayer()}</p>
-
       <p>É a vez de {getNextPlayer()}</p>
 
-      <main>
-        <div className="card" id="tictactoe-board">
-          {renderCells()}
-        </div>
-      </main>
+      <div className="pebbles-container">{renderPebbles()}</div>
+
+      <p className="pebble-count">
+        Pedras restantes: {pebbleCount}
+      </p>
+
+      <div className="take-buttons">
+        {[1, 2, 3].map((n) => (
+          <button
+            key={n}
+            disabled={!isMyTurn() || n > pebbleCount}
+            onClick={() => handleTake(n)}
+          >
+            Tirar {n}
+          </button>
+        ))}
+      </div>
 
       <button className="forfeit-btn" onClick={handleForfeit}>
         Desistir
@@ -132,4 +143,4 @@ const TicTacToe = function () {
   );
 };
 
-export default TicTacToe;
+export default Nim;

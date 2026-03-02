@@ -15,16 +15,45 @@ class Session {
   private readonly server: Server;
   public readonly id: string;
   public readonly players: Player[] = [];
-  private readonly observers = [];
+  private readonly observers: Array<(update: Result) => void> = [];
   private next?: Player;
   private timeout: NodeJS.Timeout;
+  private gameStarted = false;
+  private abandonTimeout: NodeJS.Timeout | null = null;
+  private dead = false;
+
+  public get isDead(): boolean {
+    return this.dead;
+  }
 
   public get nextPlayer(): Player {
     return this.next;
   }
 
   public subscribe(observer: (update: Result) => void) {
-    this.observers.push(observer);
+    if (!this.observers.includes(observer)) {
+      this.observers.push(observer);
+    }
+    if (this.abandonTimeout) {
+      clearTimeout(this.abandonTimeout);
+      this.abandonTimeout = null;
+    }
+  }
+
+  public unsubscribe(observer: (update: Result) => void) {
+    const index = this.observers.indexOf(observer);
+    if (index < 0) return;
+
+    this.observers.splice(index, 1);
+
+    if (this.players.length >= 2 && this.observers.length > 0) {
+      this.abandonTimeout = setTimeout(() => {
+        this.abandonTimeout = null;
+        if (this.observers.length > 0) {
+          this.clearSession();
+        }
+      }, 1500);
+    }
   }
 
   public update(result: Result) {
@@ -49,15 +78,25 @@ class Session {
     });
   }
 
-  public async interpretCommand(command: Command, notifyUpdate: (update: Result) => void) {
+  public async interpretCommand(command: Command, notifyUpdate: (update: Result) => void): Promise<Result> {
     this.debounce();
 
     if (command.action === CommandAction.SUBSCRIBE) {
       this.subscribe(notifyUpdate);
     }
 
+    if (command.action === CommandAction.ABANDON) {
+      this.clearSession();
+      return { type: ResultType.STATUS, data: { status: 'OVER', info: 'ABANDONED' } };
+    }
+
     const result: Result = await this.server.sendCommand(command);
-    this?.update(result);
+
+    if (result.type !== ResultType.ERROR) {
+      this?.update(result);
+    }
+
+    return result;
   }
 
   private debounce() {
@@ -68,6 +107,7 @@ class Session {
   }
 
   private clearSession() {
+    this.dead = true;
     const result: Result = {
       type: 'STATUS',
       data: {
@@ -76,6 +116,10 @@ class Session {
       }
     };
     this.update(result);
+  }
+
+  public markAbandoned() {
+    this.clearSession();
   }
 }
 

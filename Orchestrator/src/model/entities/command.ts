@@ -6,6 +6,7 @@ enum CommandAction {
   JOIN = "join_session",
   PLACE = "place",
   TAKE = "take",
+  ABANDON = "abandon",
 }
 
 interface Command {

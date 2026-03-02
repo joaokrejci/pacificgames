@@ -6,7 +6,8 @@ type Session = {
     id?: string
     name?: string,
     players?: Player[],
-    nextPlayer?: Player
+    nextPlayer?: Player,
+    game?: string
 }
 
 type SessionContextType = [Session, (session: Session) => void]

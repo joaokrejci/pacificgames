@@ -35,6 +35,11 @@ public class TicTacToeSession implements Session {
     }
 
     @Override
+    public synchronized boolean leave(String clientId) {
+        return players.remove(clientId);
+    }
+
+    @Override
     public synchronized boolean doAction(String clientId, String action, Object... args) {
         if (!isValid(clientId)) {
             return false;

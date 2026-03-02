@@ -43,4 +43,16 @@ public class SessionManager {
     public Session get(String sessionId) {
         return sessionMap.get(sessionId);
     }
+
+    public boolean leaveSession(String sessionId, String playerId) {
+        Session session = sessionMap.get(sessionId);
+        if (session == null) {
+            return false;
+        }
+        boolean removed = session.leave(playerId);
+        if (removed) {
+            sessionMap.remove(sessionId);
+        }
+        return removed;
+    }
 }

@@ -9,6 +9,22 @@ body {
   margin: 0;
 }
 
+.forfeit-btn {
+  background: transparent;
+  border: 1px solid #e05252;
+  color: #e05252;
+  padding: 6px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.forfeit-btn:hover {
+  background: #e05252;
+  color: #fff;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
