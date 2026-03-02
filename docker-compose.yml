@@ -13,15 +13,17 @@ services:
     networks:
       - pg-network
   
-  tictactoe-server-2:
+  connect-four-server:
     build: ./NimServer
     environment:
-      - SERVER_TYPE=tictactoe
+      - SERVER_TYPE=connectfour
     networks:
       - pg-network
   
   orchestrator:
     build: ./Orchestrator
+    ports:
+      - 3000:3000
     networks:
       - pg-network
   

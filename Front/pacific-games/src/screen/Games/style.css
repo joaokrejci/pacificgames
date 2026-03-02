@@ -31,6 +31,8 @@ a {
   img {
     padding: 34px 8px 21px;
     width: 120px;
+    height: 140px;
+    object-fit: fill;
   }
 
   p {
